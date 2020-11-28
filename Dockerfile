@@ -8,11 +8,11 @@ RUN curl --silent --location https://deb.nodesource.com/setup_14.x | bash -
 RUN apt-get install --yes nodejs
 
 ## copy csproj and restore as distinct layers
-COPY ./Dashboard/*.csproj /app
+COPY ./DashboardApi/*.csproj /app
 RUN dotnet restore
 
 # copy everything else and build app
-COPY ./Dashboard .
+COPY ./DashboardApi .
 #WORKDIR /app/build
 RUN dotnet publish -c release -o ./build --no-restore
 
