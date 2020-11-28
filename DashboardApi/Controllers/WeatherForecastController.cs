@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Dashboard.Controllers
+namespace DashboardApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]

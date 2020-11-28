@@ -1,6 +1,6 @@
 using System;
 
-namespace Dashboard
+namespace DashboardApi
 {
     public class WeatherForecast
     {
