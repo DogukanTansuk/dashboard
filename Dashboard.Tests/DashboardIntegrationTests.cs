@@ -1,16 +1,16 @@
 using System;
 using System.Threading.Tasks;
-using Dashboard;
+using DashboardApi;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace Dashboard.Tests
+namespace DashboardApi.Tests
 {
-    public class DashboardIntegrationTests : IClassFixture<WebApplicationFactory<Dashboard.Startup>>
+    public class DashboardIntegrationTests : IClassFixture<WebApplicationFactory<DashboardApi.Startup>>
     {
-        private readonly WebApplicationFactory<Dashboard.Startup> _factory;
+        private readonly WebApplicationFactory<DashboardApi.Startup> _factory;
 
-        public DashboardIntegrationTests(WebApplicationFactory<Dashboard.Startup> factory)
+        public DashboardIntegrationTests(WebApplicationFactory<DashboardApi.Startup> factory)
         {
             _factory = factory;
         }

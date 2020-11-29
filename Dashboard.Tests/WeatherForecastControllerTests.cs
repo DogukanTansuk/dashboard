@@ -2,11 +2,11 @@ using System;
 using System.Linq;
 using Xunit;
 using Moq;
-using Dashboard.Controllers;
+using DashboardApi.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Dashboard.Tests
+namespace DashboardApi.Tests
 {
     public class WeatherForecastControllerTests
     {
