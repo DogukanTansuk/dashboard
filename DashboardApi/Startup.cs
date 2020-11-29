@@ -6,9 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using DashboardApi.Services;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DashboardApi
 {
@@ -24,14 +24,14 @@ namespace DashboardApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            var jwtSecret = Configuration["JWT:Secret"];
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "DashboardApi", Version = "v1"});
             });
             
-            services.AddDbContext<DashboardContext>(options =>
+            services.AddDbContext<DashboardDBContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DashboardContext")));
 
             services.AddAuthentication(x =>
@@ -46,13 +46,13 @@ namespace DashboardApi
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey =
-                        new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"])),
+                        new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSecret)),
                     ValidateIssuer = false,
                     ValidateAudience = false,
                 };
             });
 
-            services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IAuthService>(provider => new AuthService(provider.GetRequiredService<DashboardDBContext>(), jwtSecret));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

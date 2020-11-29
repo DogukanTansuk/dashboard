@@ -12,19 +12,19 @@ namespace DashboardApi.Controllers
     public class DashboardController : ControllerBase
     {
         private readonly ILogger<DashboardController> _logger;
-        private readonly DashboardContext _context;
+        private readonly DashboardDBContext _dbContext;
 
-        public DashboardController(ILogger<DashboardController> logger, DashboardContext context)
+        public DashboardController(ILogger<DashboardController> logger, DashboardDBContext dbContext)
         {
             _logger = logger;
-            _context = context;
+            _dbContext = dbContext;
         }
 
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<IEnumerable<Case>>> GetAllCases()
         {
-            return await _context.Cases.ToListAsync();
+            return await _dbContext.Cases.ToListAsync();
         }
     }
 }

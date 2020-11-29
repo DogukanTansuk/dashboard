@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace DashboardApi.Migrations
 {
-    [DbContext(typeof(DashboardContext))]
+    [DbContext(typeof(DashboardDBContext))]
     partial class DashboardContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -50,6 +50,31 @@ namespace DashboardApi.Migrations
                     b.ToTable("Cases");
                 });
 
+            modelBuilder.Entity("DashboardApi.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Expired")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ValidUntil")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("DashboardApi.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -57,15 +82,31 @@ namespace DashboardApi.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
-                    b.Property<string>("email")
+                    b.Property<string>("Email")
                         .HasColumnType("text");
 
-                    b.Property<string>("passwordHash")
+                    b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("DashboardApi.RefreshToken", b =>
+                {
+                    b.HasOne("DashboardApi.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DashboardApi.User", b =>
+                {
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }
