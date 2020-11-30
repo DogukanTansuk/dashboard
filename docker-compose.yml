@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  web:
+    build: .
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      "JWT:Secret": "some-secret-key-that-should-be-overwritten"
+      "ConnectionStrings:DashboardContext": "Server=db;Port=5432;Database=dashboard;Username=dashboard;Password=dashboard"
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: dashboard
+      POSTGRES_PASSWORD: dashboard
+      POSTGRES_DB: dashboard
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

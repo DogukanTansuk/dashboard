@@ -1,11 +1,6 @@
-# https://hub.docker.com/_/microsoft-dotnet-core
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+# https://hub.docker.com/_/microsoft-dotnet
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /app
-
-# Fetch and install Node 10. Make sure to include the --yes parameter 
-# to automatically accept prompts during install, or it'll fail.
-RUN curl --silent --location https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install --yes nodejs
 
 ## copy csproj and restore as distinct layers
 COPY ./DashboardApi/*.csproj /app
@@ -17,6 +12,7 @@ COPY ./DashboardApi .
 RUN dotnet publish -c release -o ./build --no-restore
 
 # final stage/image
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
+WORKDIR /app
 COPY --from=build /app/build ./
-ENTRYPOINT ["dotnet", "Dashboard.dll"]
+ENTRYPOINT ["dotnet", "DashboardApi.dll"]

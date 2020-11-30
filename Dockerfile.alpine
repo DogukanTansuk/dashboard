@@ -1,9 +1,6 @@
-# https://hub.docker.com/_/microsoft-dotnet-core
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine AS build
+# https://hub.docker.com/_/microsoft-dotnet
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /app
-
-RUN apk update
-RUN apk add nodejs-current nodejs-current-npm
 
 # copy csproj and restore as distinct layers
 COPY ./DashboardApi/*.csproj /app
@@ -14,7 +11,8 @@ COPY ./DashboardApi .
 RUN dotnet publish -c release -o ./build -r linux-musl-x64 --self-contained true --no-restore /p:PublishTrimmed=true /p:PublishReadyToRun=true
 
 # final stage/image
-FROM mcr.microsoft.com/dotnet/core/runtime-deps:3.1-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine-amd64
+
 WORKDIR /app
 COPY --from=build /app/build ./
 
@@ -25,4 +23,4 @@ RUN apk add --no-cache icu-libs
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 
-ENTRYPOINT ["./Dashboard"]
+ENTRYPOINT ["./DashboardApi"]
