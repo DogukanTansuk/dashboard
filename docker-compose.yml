@@ -6,6 +6,7 @@ services:
       - "8000:80"
     depends_on:
       - db
+    restart: always
     env_file:
       - .env
     environment:
@@ -17,6 +18,7 @@ services:
       POSTGRES_USER: dashboard
       POSTGRES_PASSWORD: dashboard
       POSTGRES_DB: dashboard
+    restart: always
     volumes:
       - pgdata:/var/lib/postgresql/data
 volumes:
