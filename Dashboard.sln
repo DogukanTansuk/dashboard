@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dashboard.Tests", "Dashboard.Tests\Dashboard.Tests.csproj", "{408D98F9-1632-4D1C-892A-518C22C6F5A0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashboardApi.Tests", "DashboardApi.Tests\DashboardApi.Tests.csproj", "{408D98F9-1632-4D1C-892A-518C22C6F5A0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashboardApi", "DashboardApi\DashboardApi.csproj", "{DEE48414-5F05-4AFD-8809-107A2CD8A26F}"
 EndProject

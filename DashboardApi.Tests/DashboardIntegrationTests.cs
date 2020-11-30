@@ -1,23 +1,21 @@
-using System;
 using System.Threading.Tasks;
-using DashboardApi;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace DashboardApi.Tests
 {
-    public class DashboardIntegrationTests : IClassFixture<WebApplicationFactory<DashboardApi.Startup>>
+    public class DashboardIntegrationTests : IClassFixture<WebApplicationFactory<Startup>>
     {
-        private readonly WebApplicationFactory<DashboardApi.Startup> _factory;
+        private readonly WebApplicationFactory<Startup> _factory;
 
-        public DashboardIntegrationTests(WebApplicationFactory<DashboardApi.Startup> factory)
+        public DashboardIntegrationTests(WebApplicationFactory<Startup> factory)
         {
             _factory = factory;
         }
 
 
         [Theory]
-        [InlineData("/weatherforecast")]
+        [InlineData("/")]
         public async Task GetEndpointsSuccess(string url)
         {
             var client = _factory.CreateClient();

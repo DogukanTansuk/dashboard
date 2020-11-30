@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DashboardApi.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("auth")]
     [ApiController]
     [Produces("application/json")]
     public class AuthController : ControllerBase

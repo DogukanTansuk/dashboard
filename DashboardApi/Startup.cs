@@ -33,7 +33,8 @@ namespace DashboardApi
             
             services.AddDbContext<DashboardDBContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("DashboardContext")));
-
+            
+            
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

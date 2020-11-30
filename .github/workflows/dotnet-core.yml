@@ -1,4 +1,4 @@
-name: dotnet-core
+name: Test
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.301
+        dotnet-version: 5.0.x
     - name: Install dependencies
       run: dotnet restore
     - name: Build
@@ -25,10 +25,10 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
     - name: Generate coverage report
       run: |
-        cd ./Dashboard.Tests/
+        cd ./DashboardApi.Tests/
         dotnet test /p:CollectCoverage=true /p:CoverletOutput=TestResults/ /p:CoverletOutputFormat=lcov
     - name: Publish coverage report to coveralls.io
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: ./Dashboard.Tests/TestResults/coverage.info 
+        path-to-lcov: ./DashboardApi.Tests/TestResults/coverage.info 
