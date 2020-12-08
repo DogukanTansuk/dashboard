@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DashboardApi.Models
 {
-    public class RefreshTokenDTO
+    public class RefreshTokenDto
     {
         [Required]
-        public string refresh_token { get; set; }
+        public string RefreshToken { get; set; }
     }
 }

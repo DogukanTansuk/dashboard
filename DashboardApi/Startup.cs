@@ -1,3 +1,4 @@
+using System.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -5,10 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Microsoft.EntityFrameworkCore;
 using System.Text;
+using DashboardApi.Filters;
 using DashboardApi.Services;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 
 namespace DashboardApi
 {
@@ -30,11 +32,11 @@ namespace DashboardApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "DashboardApi", Version = "v1"});
             });
-            
-            services.AddDbContext<DashboardDBContext>(options =>
-                options.UseNpgsql(Configuration.GetConnectionString("DashboardContext")));
-            
-            
+
+
+            var connectionString = Configuration.GetConnectionString("default");
+            services.AddTransient<IDbConnection>((sp) => new NpgsqlConnection(connectionString));
+
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -53,7 +55,8 @@ namespace DashboardApi
                 };
             });
 
-            services.AddScoped<IAuthService>(provider => new AuthService(provider.GetRequiredService<DashboardDBContext>(), jwtSecret));
+            services.AddScoped<IAuthService>(provider => new AuthService(provider.GetRequiredService<IDbConnection>(), jwtSecret));
+            services.AddTransient<IStartupFilter, DatabaseMigrateFilter>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -2,11 +2,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DashboardApi.Models
 {
-    public class UserDTO
+    public class UserDto
     {
         [Required]
-        public string email { get; set; }
+        public string Email { get; }
         [Required]
-        public string password { get; set; }
+        public string Password { get; }
     }
 }

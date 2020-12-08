@@ -5,7 +5,7 @@
 
     <IsPackable>false</IsPackable>
 
-    <RootNamespace>Dashboard.Tests</RootNamespace>
+    <RootNamespace>DashboardApi.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
