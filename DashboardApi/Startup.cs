@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -9,7 +10,10 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using DashboardApi.Filters;
 using DashboardApi.Services;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Npgsql;
 
 namespace DashboardApi
@@ -21,13 +25,18 @@ namespace DashboardApi
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             var jwtSecret = Configuration["JWT:Secret"];
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                options.SerializerSettings.Converters.Add(new StringEnumConverter());
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "DashboardApi", Version = "v1"});
@@ -35,6 +44,7 @@ namespace DashboardApi
 
 
             var connectionString = Configuration.GetConnectionString("default");
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
             services.AddTransient<IDbConnection>((sp) => new NpgsqlConnection(connectionString));
 
             services.AddAuthentication(x =>
@@ -55,7 +65,9 @@ namespace DashboardApi
                 };
             });
 
-            services.AddScoped<IAuthService>(provider => new AuthService(provider.GetRequiredService<IDbConnection>(), jwtSecret));
+            services.AddScoped<IAuthService>(provider =>
+                new AuthService(provider.GetRequiredService<IDbConnection>(), provider.GetRequiredService<ILogger<AuthService>>(), jwtSecret));
+            services.AddScoped<ICovidService, CovidService>();
             services.AddTransient<IStartupFilter, DatabaseMigrateFilter>();
         }
 
@@ -68,16 +80,18 @@ namespace DashboardApi
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DashboardApi v1"));
             }
-            
+
             app.UseRouting();
+            app.UseCors(x => x
+                .WithOrigins(Configuration["AllowedOrigins"])
+                .AllowAnyMethod()
+                .AllowCredentials()
+                .AllowAnyHeader());
 
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

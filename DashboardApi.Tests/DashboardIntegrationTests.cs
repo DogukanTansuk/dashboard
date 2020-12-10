@@ -1,6 +1,11 @@
 using System.Threading.Tasks;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.Testing;
+using DashboardApi.Controllers;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace DashboardApi.Tests
 {
@@ -24,5 +29,18 @@ namespace DashboardApi.Tests
 
             response.EnsureSuccessStatusCode();
         }
+
+        [Fact]
+        public void GetWelcomeReturnsWelcomeMessage()
+        {
+            var controller = new DashboardController(new NullLogger<DashboardController>());
+            var result = controller.GetWelcome();
+            
+            var actionResult = Assert.IsType<ActionResult<Welcome>>(result);
+            var returnValue = Assert.IsType<Welcome>(actionResult.Value);
+            Assert.Equal("Welcome", returnValue.Message);
+            
+        }
     }
+    
 }

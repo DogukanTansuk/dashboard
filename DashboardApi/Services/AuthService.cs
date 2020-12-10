@@ -8,6 +8,7 @@ using System.Text;
 using DashboardApi.Models;
 using System.Threading.Tasks;
 using Dapper;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using BC = BCrypt.Net.BCrypt;
 
@@ -18,25 +19,25 @@ namespace DashboardApi.Services
         Task<AuthResponse> Authenticate(UserDto userDto);
         Task Register(UserDto userDto);
         Task<string> RefreshAccessToken(RefreshTokenDto refreshTokenDto);
-        Task<string> GenerateRefreshToken(int userId);
-        string GenerateAccessToken(IEnumerable<Claim> claims);
     }
 
     public class AuthService : IAuthService
     {
         private readonly string _jwtSecret;
         private readonly IDbConnection _dbConnection;
+        private ILogger<AuthService> _logger;
 
-        public AuthService(IDbConnection dbConnection, string jwtSecret)
+        public AuthService(IDbConnection dbConnection, ILogger<AuthService> logger, string jwtSecret)
         {
             _jwtSecret = jwtSecret;
             _dbConnection = dbConnection;
+            _logger = logger;
         }
 
         public async Task<AuthResponse> Authenticate(UserDto userDto)
         {
-            var user = await _dbConnection.QueryFirstAsync("SELECT id, email, password_hash FROM users WHERE email=$1",
-                userDto.Email);
+            var user = await _dbConnection.QueryFirstOrDefaultAsync<User>("SELECT id, email, password_hash FROM users WHERE email=@email",
+                new { email = userDto.Email});
             if (user == null || !BC.Verify(userDto.Password, user.PasswordHash))
                 throw new ServiceException(401, "Wrong Username or Password");
 
@@ -48,8 +49,8 @@ namespace DashboardApi.Services
 
         public async Task<string> RefreshAccessToken(RefreshTokenDto refreshTokenDto)
         {
-            var refreshToken = await _dbConnection.QueryFirstAsync<RefreshToken>(
-                "SELECT token, valid_until, expired, u.email FROM refresh_tokens JOIN users u on refresh_tokens.user_id = u.id WHERE token=@token",
+            var refreshToken = await _dbConnection.QueryFirstOrDefaultAsync<RefreshToken>(
+                "SELECT token, valid_until, expired, u.email as user_email FROM refresh_tokens JOIN users u on refresh_tokens.user_id = u.id WHERE token=@token",
                 new {token = refreshTokenDto.RefreshToken});
 
             if (refreshToken == null || refreshToken.ValidUntil <= DateTime.UtcNow || refreshToken.Expired)
@@ -62,7 +63,7 @@ namespace DashboardApi.Services
             return accessToken;
         }
 
-        public async Task<string> GenerateRefreshToken(int userId)
+        async Task<string> GenerateRefreshToken(int userId)
         {
             string refreshToken;
             using (RandomNumberGenerator rng = new RNGCryptoServiceProvider())
@@ -79,7 +80,7 @@ namespace DashboardApi.Services
             return refreshToken;
         }
 
-        public string GenerateAccessToken(IEnumerable<Claim> claims)
+        string GenerateAccessToken(IEnumerable<Claim> claims)
         {
             var now = DateTime.UtcNow;
             var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSecret));
@@ -94,7 +95,7 @@ namespace DashboardApi.Services
 
         public async Task Register(UserDto userDto)
         {
-            if (await _dbConnection.QuerySingleAsync("SELECT FROM users WHERE email=@email",
+            if (await _dbConnection.QueryFirstOrDefaultAsync("SELECT email FROM users WHERE email=@email",
                 new {email = userDto.Email}) != null)
             {
                 throw new ServiceException(409, "User already exists");

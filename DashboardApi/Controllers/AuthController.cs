@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using DashboardApi.Models;
 using DashboardApi.Services;
@@ -21,13 +22,13 @@ namespace DashboardApi.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody] UserDto userDto)
+        public async Task<ActionResult<AuthResponse>> Authenticate([FromBody] UserDto userDto)
         {
             if (userDto == null) return BadRequest();
             try
             {
                 var authResponse = await _authService.Authenticate(userDto);
-                return Ok(authResponse);
+                return authResponse;
             }
             catch (ServiceException e)
             {
@@ -37,12 +38,20 @@ namespace DashboardApi.Controllers
 
         [AllowAnonymous]
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto refreshTokenDto)
+        public async Task<ActionResult<RefreshResponse>> Refresh([FromBody] RefreshTokenDto refreshTokenDto)
         {
             if (refreshTokenDto == null) return BadRequest();
+            try
+            {
+                var accessToken = await _authService.RefreshAccessToken(refreshTokenDto);
+                return new RefreshResponse {Token = accessToken};
+
+            }
+            catch (ServiceException e)
+            {
+                return StatusCode(e.StatusCode, new {message = e.ErrorMessage});
+            }
             
-            var accessToken = await _authService.RefreshAccessToken(refreshTokenDto);
-            return Ok(new RefreshResponse {Token = accessToken});
         }
 
         [AllowAnonymous]
