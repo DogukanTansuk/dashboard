@@ -41,8 +41,12 @@ namespace DashboardApi.Services
             if (user == null || !BC.Verify(userDto.Password, user.PasswordHash))
                 throw new ServiceException(401, "Wrong Username or Password");
 
-            var accessToken = GenerateAccessToken(claims: new[] {new Claim(ClaimTypes.Name, userDto.Email)});
-            var refreshToken = await GenerateRefreshToken(user.Id);
+            var accessToken = AuthUtils.GenerateAccessToken(claims: new[] {new Claim(ClaimTypes.Name, userDto.Email)}, _jwtSecret);
+            var refreshToken = AuthUtils.GenerateRefreshToken(user.Id);
+            
+            await _dbConnection.ExecuteAsync(
+                "INSERT INTO refresh_tokens(user_id, valid_until, token) VALUES (@userId, @validUntil, @token)",
+                new {userId = user.Id, validUntil = DateTime.UtcNow.AddDays(7), token = refreshToken});
 
             return new AuthResponse {AccessToken = accessToken, RefreshToken = refreshToken};
         }
@@ -58,39 +62,9 @@ namespace DashboardApi.Services
                 throw new ServiceException(401, "Invalid refresh token");
             }
 
-            var accessToken = GenerateAccessToken(new[] {new Claim(ClaimTypes.Name, refreshToken.UserEmail)});
+            var accessToken = AuthUtils.GenerateAccessToken(new[] {new Claim(ClaimTypes.Name, refreshToken.UserEmail)}, _jwtSecret);
 
             return accessToken;
-        }
-
-        async Task<string> GenerateRefreshToken(int userId)
-        {
-            string refreshToken;
-            using (RandomNumberGenerator rng = new RNGCryptoServiceProvider())
-            {
-                var tokenData = new byte[32];
-                rng.GetBytes(tokenData);
-
-                refreshToken = Convert.ToBase64String(tokenData);
-            }
-
-            await _dbConnection.ExecuteAsync(
-                "INSERT INTO refresh_tokens(user_id, valid_until, token) VALUES (@userId, @validUntil, @token)",
-                new {userId = userId, validUntil = DateTime.UtcNow.AddDays(7), token = refreshToken});
-            return refreshToken;
-        }
-
-        string GenerateAccessToken(IEnumerable<Claim> claims)
-        {
-            var now = DateTime.UtcNow;
-            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSecret));
-            var accessToken = new JwtSecurityToken(
-                claims: claims,
-                notBefore: now,
-                expires: now.AddHours(1),
-                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
-            );
-            return new JwtSecurityTokenHandler().WriteToken(accessToken);
         }
 
         public async Task Register(UserDto userDto)

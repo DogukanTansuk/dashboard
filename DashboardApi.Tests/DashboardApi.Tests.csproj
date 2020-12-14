@@ -29,4 +29,8 @@
     <DotNetCliToolReference Include="dotnet-reportgenerator-cli" Version="4.2.10" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Utils" />
+  </ItemGroup>
+
 </Project>
