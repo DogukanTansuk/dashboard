@@ -29,6 +29,24 @@ namespace DashboardApi.Tests
             Assert.NotNull(propertyInfo);
             Assert.Equal("Successfully registered please login!", propertyInfo.GetValue(actionResult.Value, null));
         }
-        
+
+
+        [Fact]
+        public async Task Register_ReturnsOkWithUnknownParameters()
+        {
+            var controller = new AuthController(new TestAuthService(SecretKey));
+            var userToRegister = new UserDto { Email = "", Password = ""};
+
+            var result = await controller.Register(userToRegister);
+
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            var actionValue = actionResult.Value;
+
+            Assert.Equal(200, actionResult.StatusCode);
+            var propertyInfo = actionValue.GetType().GetProperty("message");
+            Assert.NotNull(propertyInfo);
+            Assert.Equal("Successfully registered please login!", propertyInfo.GetValue(actionResult.Value, null));
+        }
+
     }
 }
