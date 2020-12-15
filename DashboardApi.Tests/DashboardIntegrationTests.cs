@@ -18,7 +18,6 @@ namespace DashboardApi.Tests
             _factory = factory;
         }
 
-
         [Theory]
         [InlineData("/")]
         public async Task GetEndpointsSuccess(string url)
@@ -29,76 +28,7 @@ namespace DashboardApi.Tests
 
             response.EnsureSuccessStatusCode();
         }
-
-
-        [Theory]
-        [InlineData("cases")]
-        public async Task GetCasesSuccess(string url)
-        {
-            var client = _factory.CreateClient();
-
-            var response = await client.GetAsync(url);
-
-            response.EnsureSuccessStatusCode();
-        }
-
-        [Theory]
-        [InlineData("cases/?country=Turkey")]
-        public async Task GetCasesWithCountrySuccess(string url)
-        {
-            var client = _factory.CreateClient();
-
-            var response = await client.GetAsync(url);
-
-            response.EnsureSuccessStatusCode();
-        }
-
-
-        [Theory]
-        [InlineData("cases/topCountries")]
-        public async Task GetTopCountriesSuccess(string url)
-        {
-            var client = _factory.CreateClient();
-
-            var response = await client.GetAsync(url);
-
-            response.EnsureSuccessStatusCode();
-        }
-
-        [Theory]
-        [InlineData("cases/topCountries/?sortby=confirmed_today")]
-        public async Task GetTopCountriesWithSortBySuccess(string url)
-        {
-            var client = _factory.CreateClient();
-
-            var response = await client.GetAsync(url);
-
-            response.EnsureSuccessStatusCode();
-        }
-
-        [Theory]
-        [InlineData("cases/totalCases")]
-        public async Task GetTotalCasesSuccess(string url)
-        {
-            var client = _factory.CreateClient();
-
-            var response = await client.GetAsync(url);
-
-            response.EnsureSuccessStatusCode();
-        }
-
-        [Theory]
-        [InlineData("cases/totalCases/?country=Turkey")]
-        public async Task GetTotalCasesWithCountrySuccess(string url)
-        {
-            var client = _factory.CreateClient();
-
-            var response = await client.GetAsync(url);
-
-            response.EnsureSuccessStatusCode();
-        }
-
-
+        
         [Fact]
         public void GetWelcomeReturnsWelcomeMessage()
         {
