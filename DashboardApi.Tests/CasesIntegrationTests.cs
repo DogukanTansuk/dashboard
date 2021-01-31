@@ -30,6 +30,7 @@ namespace DashboardApi.Tests
         [InlineData("cases/?country=Turkey")]
         [InlineData("cases/?country=turkey")]
         [InlineData("cases/?country=TURKEY")]
+        [InlineData("cases/?country=TuRkEy")]
         [InlineData("cases/?country=US")]
         [InlineData("cases/?country=uS")]
         [InlineData("cases/?country=us")]
@@ -39,6 +40,7 @@ namespace DashboardApi.Tests
         [InlineData("cases/totalCases/?country=Turkey")]
         [InlineData("cases/totalCases/?country=turkey")]
         [InlineData("cases/totalCases/?country=TURKEY")]
+        [InlineData("cases/totalCases/?country=TuRkEy")]
         [InlineData("cases/totalCases/?country=uS")]
         [InlineData("cases/totalCases/?country=US")]
         [InlineData("cases/totalCases/?country=us")]
@@ -56,6 +58,8 @@ namespace DashboardApi.Tests
         [Theory]
         [InlineData("cases1")]
         [InlineData("cases/?country=US1")]
+        [InlineData("cases213")]
+        [InlineData("cases/?country=Turkeyt")]
         public async Task CasesControllerEndpointsReturnsFail(string url)
         {
             var client = _factory.CreateClient();
@@ -85,6 +89,7 @@ namespace DashboardApi.Tests
         [InlineData("cases/totalCases/?country=Turkey")]
         [InlineData("cases/totalCases/?country=turkey")]
         [InlineData("cases/totalCases/?country=TURKEY")]
+        [InlineData("cases/totalCases/?country=TuRkEY")]
         [InlineData("cases/totalCases/?country=uS")]
         [InlineData("cases/totalCases/?country=US")]
         [InlineData("cases/totalCases/?country=us")]
@@ -111,6 +116,7 @@ namespace DashboardApi.Tests
         [InlineData("cases/?country=Turkey", "Turkey")]
         [InlineData("cases/?country=turkey", "Turkey")]
         [InlineData("cases/?country=TURKEY", "Turkey")]
+        [InlineData("cases/?country=TuRKeY", "Turkey")]
         [InlineData("cases/?country=US", "US")]
         [InlineData("cases/?country=uS", "US")]
         [InlineData("cases/?country=us", "US")]
